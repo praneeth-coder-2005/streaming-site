@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plyr M3U8 Streaming Player</title>
+    <!-- Plyr CSS -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.6.8/plyr.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        #player {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            aspect-ratio: 16/9;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 0 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <video id="player" controls></video>
+</div>
+
+<script src="https://cdn.plyr.io/3.6.8/plyr.polyfilled.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const video = document.getElementById('player');
+    const source = 'https://dai.fancode.com/primary/103397_english_hls_5914ta-di/index.m3u8'; // Replace with your M3U8 link
+
+    if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(source);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, function () {
+            video.play();
+        });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = source;
+        video.addEventListener('loadedmetadata', function () {
+            video.play();
+        });
+    }
+
+    const player = new Plyr(video);
+
+    // Popup for Telegram Channel
+    setTimeout(() => {
+        const joinTelegram = confirm("Join Our Telegram Channel For Live Links");
+        if (joinTelegram) {
+            window.location.href = "https://t.me/star_ccricket"; // Replace with your Telegram channel link
+        }
+    }, 1000); // Popup after 1 second
+});
+</script>
+
+</body>
+</html>
