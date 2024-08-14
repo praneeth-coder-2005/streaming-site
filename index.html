@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plyr M3U8 Streaming Player</title>
+    <title>Plyr M3U8 Streaming Player with Quality Selection</title>
     <!-- Plyr CSS -->
     <link rel="stylesheet" href="https://cdn.plyr.io/3.6.8/plyr.css" />
     <style>
@@ -41,45 +41,30 @@
 
 <script src="https://cdn.plyr.io/3.6.8/plyr.polyfilled.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/plyr-hls-quality/dist/plyr-hls-quality.min.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const video = document.getElementById('player');
-    const source = 'https://dai.fancode.com/primary/103397_english_hls_5914ta-di/index.m3u8'; // Replace with your M3U8 link
+    const source = 'https://example.com/path/to/your/video.m3u8'; // Replace with your M3U8 link
 
     if (Hls.isSupported()) {
         const hls = new Hls();
         hls.loadSource(source);
         hls.attachMedia(video);
-
-        hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
-            const availableQualities = hls.levels.map((level, index) => ({
-                label: level.height + 'p', 
-                value: index,
-            }));
-            availableQualities.push({ label: 'Auto', value: -1 });
-            
-            player.quality = {
-                default: availableQualities.findIndex(q => q.value === hls.currentLevel),
-                options: availableQualities,
-                forced: true,
-                onChange: (newQuality) => {
-                    if (newQuality === -1) {
-                        hls.currentLevel = -1; // Auto
-                    } else {
-                        hls.currentLevel = newQuality;
-                    }
-                },
-            };
+        hls.on(Hls.Events.MANIFEST_PARSED, function () {
+            const plyr = new Plyr(video);
+            window.plyr = plyr;
+            plyrHlsQuality.setup(plyr, hls);
         });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         video.src = source;
         video.addEventListener('loadedmetadata', function () {
             video.play();
         });
+    } else {
+        const player = new Plyr(video);
     }
-
-    const player = new Plyr(video);
 
     // Popup for Telegram Channel
     setTimeout(() => {
