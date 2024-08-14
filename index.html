@@ -51,8 +51,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const hls = new Hls();
         hls.loadSource(source);
         hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, function () {
-            video.play();
+
+        hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
+            const availableQualities = hls.levels.map((level, index) => ({
+                label: level.height + 'p', 
+                value: index,
+            }));
+            availableQualities.push({ label: 'Auto', value: -1 });
+            
+            player.quality = {
+                default: availableQualities.findIndex(q => q.value === hls.currentLevel),
+                options: availableQualities,
+                forced: true,
+                onChange: (newQuality) => {
+                    if (newQuality === -1) {
+                        hls.currentLevel = -1; // Auto
+                    } else {
+                        hls.currentLevel = newQuality;
+                    }
+                },
+            };
         });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         video.src = source;
@@ -65,9 +83,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Popup for Telegram Channel
     setTimeout(() => {
-        const joinTelegram = confirm("Join Our Telegram Channel For Live Links");
+        const joinTelegram = confirm("Join Our Telegram Channel @YourTelegramChannel");
         if (joinTelegram) {
-            window.location.href = "https://t.me/star_ccricket"; // Replace with your Telegram channel link
+            window.location.href = "https://t.me/YourTelegramChannel"; // Replace with your Telegram channel link
         }
     }, 1000); // Popup after 1 second
 });
